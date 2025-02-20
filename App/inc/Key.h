@@ -1,21 +1,18 @@
 #ifndef __KEY_H
 #define __KEY_H
 
-#include <reg51.h>
+#include "REG52.H"
 
-#define KEYPORT P2;
+sbit S3 = P3^5;//闹钟功能
+sbit S4 = P3^6;//秒表功能
+sbit S5 = P3^4;//校时位选
+sbit S6 = P3^2;//数值加//EX0
+sbit S7 = P3^3;//数值减//EX1
+sbit S8 = P3^7;//切换功能
 
-sbit KEYIN1 = P2^0;
-sbit KEYIN2 = P2^1;
-sbit KEYIN3 = P2^2;
-sbit KEYIN4 = P2^3;
-sbit KEYOUT1 = P2^4;
-sbit KEYOUT2 = P2^5;
-sbit KEYOUT3 = P2^6;
-sbit KEYOUT4 = P2^7;
-
-void Key_Set(unsigned char, unsigned char);
-unsigned char Key_Scan(void);
-//void Key_Service(void);
+void S3_Init(void);
+void S4_Init(void);
+void S5_Init(void);
+void S8_Init(void);
 
 #endif

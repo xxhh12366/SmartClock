@@ -3,7 +3,9 @@
   "type": "C51",
   "dependenceList": [],
   "srcDirs": [
-    "src"
+    "App",
+    "Hardware",
+    "User"
   ],
   "outDir": "build",
   "virtualFolder": {
@@ -30,7 +32,11 @@
       "uploadConfigMap": {},
       "custom_dep": {
         "name": "default",
-        "incList": [],
+        "incList": [
+          "App",
+          "Hardware",
+          "User"
+        ],
         "libList": [],
         "defineList": []
       },

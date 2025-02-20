@@ -1,85 +1,123 @@
 /***********************
 时间：2025.01.010
-内容：按键应用
+内容：三个按键
 版本：V1.0
 ************************/
 
-#include <reg51.h>
+#include "REG52.H"
 #include <intrins.h>
-#include "delay.h"
-#include "Key.h"
-#include "LED.h"
+#include "KEY.H"
+#include "TIMER.H"
 
-void Key_Set(unsigned char OutPin, unsigned char *KeyNum)
+/***********************
+名字：S3_Init()
+时间：2025.02.20
+内容：进入闹钟状态；退出（启动）闹钟状态；
+类型：void
+************************/
+void S3_Init()
 {
-	KEYOUT1 = (OutPin == 1)? 0:1;
-	KEYOUT2 = (OutPin == 2)? 0:1;
-	KEYOUT3 = (OutPin == 3)? 0:1;
-	KEYOUT4 = (OutPin == 4)? 0:1;
-	
-	if(!KEYIN1 || !KEYIN2 || !KEYIN3 || !KEYIN4)
-	{
-		DelayXms(10);
-			if(!KEYIN1 || !KEYIN2 || !KEYIN3 || !KEYIN4)
+	if (!S3)//进入闹钟功能
+        {
+           if(funcState = 2)
+            {
+                funcState = 0;
+                showRight();
+            }
+            else
+            {
+                funcState = 2;
+                showRight();
+            }
+        }
+}
+
+/***********************
+名字：S4_Init()
+时间：2025.02.20
+内容：进入与退出秒表功能
+类型：void
+************************/
+void S4_Init()
+{
+	if (!S4)//进入秒表功能
+        {
+            if(funcState = 3)
+            {
+                funcState = 0;
+                showRight();
+            }
+            else
+            {
+                funcState = 3;
+                showRight();
+            }
+        }
+}
+
+/***********************
+名字：S5_Init()
+时间：2025.02.20
+内容：进入校时功能，就是可以选择位置
+类型：void
+************************/
+void S5_Init()
+{
+	if (!S5)//进入校时功能
+        {
+            if (!changeSwitch)//若不在校时状态
+            {
+                changeSwitch = 1;
+                wei++;
+                if (wei > 4)
+                {
+                    wei = 1;
+                }
+            }
+            else
+            {
+                changeSwitch = 0;
+				wei = 1;
+            }
+        }
+}
+
+/***********************
+名字：S8_Init()
+时间：2025.02.20
+内容：秒表时控制计时开始，停止与清零；
+	 闹钟响时退出提醒（alarmRing）;
+	 时钟状态下切换时钟显示状态
+类型：void
+************************/
+void S8_Init()
+{
+	if(!S8)
+        {
+            switch (funcState)
+            {
+            case 3://秒表状态下S8开关计时
+                switch(stopwatchSwitch)
+                {
+                    case 1:stopwatchSwitch = 2;showRight();break;
+                    case 2:stopwatchSwitch = 3;break;
+                    case 3:stopwatchSwitch = 1;stopwatchSec = 0;stopwatchMin = 0;showRight();break;
+                    default:break;
+                }
+                break;
+            case 0://在时钟状态下切换时钟页面
+                State++;//切换时钟显示状态
+                if(State >= 4)
+                {
+                    State = 0;
+                }
+                break;
+            default:break;
+            }
+			if(alarmSwitch && alarmRing)
 			{
-				if(KEYIN1 == 0)*KeyNum = 10 + OutPin;
-				if(KEYIN2 == 0)*KeyNum = 20 + OutPin;
-				if(KEYIN3 == 0)*KeyNum = 30 + OutPin;
-				if(KEYIN4 == 0)*KeyNum = 40 + OutPin;
+				alarmRing = 0;
 			}
-	}while (!KEYIN1 || !KEYIN2 || !KEYIN3 || !KEYIN4);
+        }
 }
 
-unsigned char Key_Scan()
-{
-	unsigned char temp, temp2, KeyNum = 0;
-	unsigned char *ptr_KEYPORT;
-	*ptr_KEYPORT = 0xf0;
-	temp = *ptr_KEYPORT;
-	if(temp != 0xf0)//指有按键按下，P2收到的数据不对
-	{
-		DelayXms(10);
-		if(temp != 0xf0)//1111 0000 去检查列
-		{
-			temp = *ptr_KEYPORT & 0xf0;//通过按位与,取高四位,在这里得到按键的列号
-			*ptr_KEYPORT = 0x0f;//0000 1111  去检查行
-			temp2 = *ptr_KEYPORT & 0x0f;	//通过按位与,取低四位,在这里得到按键的行号	
-		}
-
-	}while(temp != 0xf0);//只一个按键按下，虽然两个方向都进行判断，但是消除按键抖动只用做一次
-	
-	switch(temp + temp2)
-	{
-		case 0xee:KeyNum = 1;break;//1110 1110
-		case 0xdd:KeyNum = 2;break;//1101 1101
-	}
-
-	return KeyNum;
-}
-
-//void Key_Service()
-//{
-//		switch(Key_Scan())
-//		{
-//			case 0:break;
-//			case 1:Startflag = 1;break;
-//			case 2:Startflag = 0;break;
-//			case 3:UpDownflag = 1;break;
-//			case 4:UpDownflag = 0;break;
-//			default:break;
-//		}
-//		if(Startflag)
-//		{
-//		P1 = temp;
-//			if(UpDownflag)
-//			{
-//				temp = _crol_(temp,1);
-//			}
-//			else
-//			{
-//				temp = _cror_(temp,1);
-//			}
-//			DelayXms(500);
-//		}
-
-//}
